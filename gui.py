@@ -40,9 +40,10 @@ class LeakDetectorApp:
         # Set up the figure and plot
         plt.style.use('dark_background')
         self.fig, self.ax = plt.subplots()
-        self.line, = self.ax.plot([], [], lw=2)
+        self.line, = self.ax.plot([], [],color="m", lw=2)
         self.ax.set_xlabel('Time')
         self.ax.set_ylabel(f'Leak Rate {self.units}')
+        self.fill = None
         
         # Embed matplotlib figure in Tkinter
         self.canvas = FigureCanvasTkAgg(self.fig, master=root)
@@ -69,7 +70,7 @@ class LeakDetectorApp:
         self.uptime.append(uptime)
         self.leakrate.append(leakrate)
         self.status = status
-        if len(self.timestamp) > 60*2:
+        if len(self.timestamp) > 120*2:
             self.timestamp.pop(0)
             self.uptime.pop(0)
             self.leakrate.pop(0)
@@ -78,6 +79,8 @@ class LeakDetectorApp:
         # Update plot data
         self.line.set_data(self.uptime,self.leakrate)
         self.ax.relim()
+        #y0,x0 = self.ax.get_ybound()
+        #self.fill = self.ax.fill_between(self.uptime,[y0 for tmp in range(120)],self.leakrate,color="m",alpha=0.6)
         for txt in self.ax.texts:
             txt.remove()
         self.ax.text(0.05,0.95,f"Status: {status}\n{leakrate} {self.units}", transform=self.ax.transAxes, fontsize=14,verticalalignment='top', bbox=self.props)
